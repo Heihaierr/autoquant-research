@@ -66,8 +66,9 @@ notes marking a rule as market-specific rather than general.
 1. Fork, branch from `main`
 2. One logical change per PR
 3. If you're proposing a rule change, say what evidence or reasoning backs it
-4. English for all committed content; a Chinese edition lives under
-   `docs/zh/`
+4. English for skills, templates, and code comments. The top-level README
+   has two editions kept in sync — Chinese at the repo root, English under
+   `docs/en/`
 
 ## What gets rejected
 
