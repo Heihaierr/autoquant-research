@@ -1,0 +1,13 @@
+# Minimal dependencies for the template project.
+# Nothing here is exotic on purpose: a research stack you cannot install in
+# thirty seconds is one you will stop reproducing.
+
+pandas>=2.0
+numpy>=1.24
+PyYAML>=6.0
+
+# Only needed if your price cache is Parquet rather than CSV.
+pyarrow>=14.0
+
+# Test suite.
+pytest>=7.4

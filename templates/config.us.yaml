@@ -1,0 +1,139 @@
+# Research configuration — US multi-asset ETF demo.
+#
+# Ready to run against the snapshot in data/cache/, so the loop can be executed
+# offline immediately after cloning:
+#
+#   PYTHONPATH=. python data/qc_data_quality.py --config config.us.yaml
+#   PYTHONPATH=. python framework/walk_forward.py --strategy s0_passive \
+#       --config config.us.yaml
+#
+# Copy to config.yaml if you want it picked up automatically. See
+# config.example.yaml for the annotated version of every field.
+
+# ---------------------------------------------------------------------------
+# Research data hard cutoff.
+#
+# WHY THIS EXISTS: data after this date must never reach a backtest. Any period
+# you have already seen is not out-of-sample, no matter how the code is written.
+# data_loader enforces this with an assertion rather than trusting discipline.
+#
+# The snapshot runs past this date on purpose. 2025 onward is untouched sample
+# that only tracking/ is allowed to see, which is the only kind of evidence
+# that survives having designed the strategy.
+# ---------------------------------------------------------------------------
+research_end: "2024-12-31"
+
+data:
+  cache_dir: "data/cache"
+  # Total-return adjusted (dividends reinvested).
+  price_file: "prices_us.parquet"
+  # Unadjusted companion. Never used by the engine — qc_data_quality.py
+  # subtracts its annualized return from the adjusted one to recover the
+  # distribution yield the data implies, which is the check that establishes
+  # the adjustment actually happened.
+  raw_price_file: "prices_us_raw.parquet"
+
+calendar:
+  trading_days_per_year: 252
+  # Idle cash in a US brokerage account earns roughly the T-bill yield through
+  # a sweep or money-market fund. Enters Sharpe and Sortino directly.
+  risk_free_annual: 0.04
+
+cost:
+  # 4bp one way: zero commission at a retail broker, plus roughly half the
+  # spread on these eleven, all of which are among the most liquid ETFs listed.
+  # DBC is the widest and would justify more on its own.
+  one_way: 0.0004
+  stress_multiplier: 2.0
+  # US-listed ETFs carry no short-term redemption fee. Holding-period taxes are
+  # real and are not modelled here.
+  min_hold_days: 0
+  short_hold_penalty: 0.0
+
+rebalance:
+  freq: monthly
+  offsets: [0, 5, 10, 15]
+  top_n: 3
+  trade_lag: 0
+
+walk_forward:
+  # 2008 is the first test year the two-year warm-up allows, and including it
+  # is deliberate: a multi-asset universe evaluated only on 2015+ has never
+  # been asked what it does when equities and credit fall together.
+  first_test_year: 2008
+  last_test_year: 2024
+  lookback_years: 2
+
+benchmark:
+  primary: "SPY"
+  # One sleeve per asset class at equal weight, rather than equal weight over
+  # all eleven columns — that would put 3/11 in US equity beta and make the
+  # "passive" comparison a US equity bet with a diversification story.
+  passive_blend:
+    - {code: "SPY", weight: 0.125}
+    - {code: "EFA", weight: 0.125}
+    - {code: "EEM", weight: 0.125}
+    - {code: "TLT", weight: 0.125}
+    - {code: "LQD", weight: 0.125}
+    - {code: "GLD", weight: 0.125}
+    - {code: "DBC", weight: 0.125}
+    - {code: "VNQ", weight: 0.125}
+
+# ---------------------------------------------------------------------------
+# Instrument universe.
+#
+#   expect_yield  approximate distribution yield over the sample period, used
+#                 only by qc_data_quality.py. It is an order-of-magnitude
+#                 anchor from published fund data, not a target: the check is
+#                 sized to catch an adjustment chain that is broken, which
+#                 shows up as a yield several times too large or negative.
+#                 A source rejected for this universe implied 12.75%/yr for
+#                 EFA and 6.41% for IWM.
+#   limit_group   key into PRICE_LIMIT_RULES in data/qc_price_limits.py. US
+#                 venues cap nothing per instrument; halts stop trading rather
+#                 than bound the price.
+# ---------------------------------------------------------------------------
+universe:
+  - {code: "SPY", name: "US large-cap equity",        region: US, category: equity_broad,   limit_group: none, expect_yield: 0.020}
+  - {code: "QQQ", name: "US tech-heavy equity",       region: US, category: equity_growth,  limit_group: none, expect_yield: 0.008}
+  - {code: "IWM", name: "US small-cap equity",        region: US, category: equity_small,   limit_group: none, expect_yield: 0.014}
+  - {code: "EFA", name: "Developed ex-US equity",     region: DM, category: equity_intl,    limit_group: none, expect_yield: 0.030}
+  - {code: "EEM", name: "Emerging-market equity",     region: EM, category: equity_em,      limit_group: none, expect_yield: 0.023}
+  - {code: "TLT", name: "Long US Treasuries",         region: US, category: bond_long,      limit_group: none, expect_yield: 0.033}
+  - {code: "IEF", name: "Intermediate US Treasuries", region: US, category: bond_mid,       limit_group: none, expect_yield: 0.027}
+  - {code: "LQD", name: "Investment-grade credit",    region: US, category: bond_credit,    limit_group: none, expect_yield: 0.042}
+  - {code: "GLD", name: "Gold",                       region: XX, category: commodity_gold, limit_group: none, expect_yield: 0.000}
+  - {code: "DBC", name: "Broad commodities",          region: XX, category: commodity_broad, limit_group: none, expect_yield: 0.010}
+  - {code: "VNQ", name: "US REITs",                   region: US, category: real_estate,    limit_group: none, expect_yield: 0.042}
+
+qc:
+  # Loose on purpose: expect_yield is a single figure standing in for two
+  # decades of varying payouts, so anything tighter fails on real drift rather
+  # than on corruption. A broken adjustment chain misses by multiples, not by
+  # a percentage point.
+  yield_tolerance: 0.015
+  # None of these eleven has had a unit conversion or an unadjusted split over
+  # the sample; the split-jump scan finds nothing on either the adjusted or the
+  # unadjusted table. Left in place because an added instrument may need it.
+  redenominations: {}
+  negative_yield_floor: -0.002
+  plausible_cagr: [-0.10, 0.30]
+  max_missing_fraction: 0.02
+  min_observations: 250
+
+circuit_breaker:
+  enabled: false
+  soft_dd: 0.08
+  soft_scale: 0.50
+  hard_dd: 0.12
+  hard_cool: 10
+  daily_loss: 0.02
+  daily_loss_cool: 5
+  defensive_code: null
+
+tracking:
+  # US-listed ETFs trade in single shares.
+  lot_size: 1
+  capital: 100000
+  divergence_alert: 0.02
+  price_tolerance: 0.005

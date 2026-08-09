@@ -1,0 +1,25 @@
+{
+  "name": "autoquant-research",
+  "displayName": "AutoQuant Research",
+  "description": "A complete quantitative research methodology: goal setting, data integrity, walk-forward evaluation, honest attribution, and live tracking",
+  "version": "0.1.0",
+  "author": {
+    "name": "bohao",
+    "email": "bhaoliu@163.com"
+  },
+  "homepage": "https://github.com/Heihaierr/autoquant-research",
+  "repository": "https://github.com/Heihaierr/autoquant-research",
+  "license": "MIT",
+  "keywords": [
+    "quant",
+    "quantitative-research",
+    "backtesting",
+    "overfitting",
+    "walk-forward",
+    "trading-strategy",
+    "portfolio",
+    "research-methodology",
+    "skills"
+  ],
+  "skills": "./skills/"
+}

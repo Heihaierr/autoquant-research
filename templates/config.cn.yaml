@@ -1,0 +1,172 @@
+# Research configuration — China A-share multi-asset ETF demo.
+#
+# Ready to run against the snapshot in data/cache/, so the loop can be executed
+# offline immediately after cloning:
+#
+#   PYTHONPATH=. python data/qc_data_quality.py --config config.cn.yaml
+#   PYTHONPATH=. python data/qc_price_limits.py --config config.cn.yaml
+#   PYTHONPATH=. python framework/walk_forward.py --strategy s0_passive \
+#       --config config.cn.yaml
+#
+# Copy to config.yaml if you want it picked up automatically. See
+# config.example.yaml for the annotated version of every field.
+
+# ---------------------------------------------------------------------------
+# Research data hard cutoff.
+#
+# WHY THIS EXISTS: data after this date must never reach a backtest. Any period
+# you have already seen is not out-of-sample, no matter how the code is written.
+# data_loader enforces this with an assertion rather than trusting discipline.
+#
+# The snapshot runs past this date on purpose. 2025 onward is untouched sample
+# that only tracking/ is allowed to see, which is the only kind of evidence
+# that survives having designed the strategy.
+# ---------------------------------------------------------------------------
+research_end: "2024-12-31"
+
+data:
+  cache_dir: "data/cache"
+  # Total-return adjusted (distributions reinvested), rescaled so the last
+  # value is the last traded price.
+  price_file: "prices_cn.parquet"
+  # Unadjusted companion. Never used by the engine — qc_data_quality.py
+  # divides one by the other to recover the distribution yield the data
+  # implies, which is the check that establishes the adjustment happened.
+  raw_price_file: "prices_cn_raw.parquet"
+
+calendar:
+  # Mainland China loses a week to each of two national holidays on top of the
+  # usual public days.
+  trading_days_per_year: 244
+  # Idle cash on-exchange earns the money-market rate. Enters Sharpe and
+  # Sortino directly, and at this level it is small enough that leaving it at
+  # a US-like 4% would silently subtract 2.5pp from every Sharpe.
+  risk_free_annual: 0.015
+
+cost:
+  # 6bp one way: commission around 2-3bp at a competitive broker (no stamp duty
+  # on funds) plus roughly half the spread. The cross-border sleeves are the
+  # wide ones and would justify more on their own.
+  one_way: 0.0006
+  stress_multiplier: 2.0
+  # On-exchange ETFs carry no short-term redemption fee, so this is off. It is
+  # NOT off because holding periods do not matter here: the off-exchange
+  # feeder funds for these same indices charge 1.5% on redemptions inside 7
+  # days, which is enough to rule out weekly rebalancing entirely. If you move
+  # this universe off-exchange, set min_hold_days: 7 before believing anything.
+  #
+  # T+1 settlement is a separate constraint and is not modelled by this field.
+  # It forbids selling what you bought today rather than pricing it, and a
+  # monthly schedule never encounters it.
+  min_hold_days: 0
+  # Inert while min_hold_days is 0, and left at the off-exchange rate so that
+  # raising min_hold_days is a one-line change rather than two.
+  short_hold_penalty: 0.015
+
+rebalance:
+  freq: monthly
+  offsets: [0, 5, 10, 15]
+  top_n: 3
+  trade_lag: 0
+
+walk_forward:
+  # 2015 is the first test year the two-year warm-up allows, and including it
+  # is deliberate: it is the leveraged bubble and its collapse, the single most
+  # informative year in this market's recent history and the one a strategy
+  # tuned on 2019+ has never seen.
+  first_test_year: 2015
+  last_test_year: 2024
+  lookback_years: 2
+
+benchmark:
+  # Excess return is measured against this single instrument, so s0_passive
+  # clears the 2pp scrutiny trigger on the first run at 3.67%/yr. That is not a
+  # bug to tune away: the CSI 300 sleeve compounded at 6.07% over this sample
+  # while the Nasdaq QDII sleeve did 20.38% and gold 9.82%, so a blend holding
+  # both should beat it by about that much. Keeping the domestic index as the
+  # primary is still right, because it is what a China-based holder would
+  # otherwise own, and a baseline that trips the trigger is a cheap
+  # demonstration of what the trigger is for.
+  primary: "510300"
+  # One sleeve per asset class at equal weight. Equal weight over all eleven
+  # columns would put 4/11 in domestic equity beta and make the "passive"
+  # comparison a China equity bet with a diversification story.
+  passive_blend:
+    - {code: "510300", weight: 0.20}
+    - {code: "513100", weight: 0.20}
+    - {code: "159920", weight: 0.20}
+    - {code: "518880", weight: 0.20}
+    - {code: "511010", weight: 0.20}
+
+# ---------------------------------------------------------------------------
+# Instrument universe.
+#
+#   expect_yield  approximate distribution yield over the sample period, used
+#                 only by qc_data_quality.py. Most of these are zero and that
+#                 is not an error: unlike US ETFs, most Chinese ETFs accumulate
+#                 income into net asset value instead of paying it out. The
+#                 consequence for QC is that a broken adjustment chain is
+#                 harder to see here — there is no 4%/yr signal to lose — so
+#                 the tolerance is tighter than the US config's.
+#                 The two equity sleeves below are the exception and are the
+#                 only place the source chains disagree: the reconstruction
+#                 from Sina's distribution records reads 1.67%/yr on 510300
+#                 and 0.43% on 510500, Tencent's NAV-derived factor reads
+#                 1.21% and 1.37%, and no third source settled it. Both
+#                 tolerate the value here, but treat the income component of
+#                 these two as uncertain to about 1pp/yr.
+#   limit_group   key into PRICE_LIMIT_RULES in data/qc_price_limits.py.
+#                 Cross-border ETFs are exempt from the domestic daily limit,
+#                 which is why their premiums can run as far as they do;
+#                 filing one under cn_main reports every real move as corrupt.
+#                 ChiNext and STAR sit in the 20% band.
+# ---------------------------------------------------------------------------
+universe:
+  - {code: "510300", name: "CSI 300 large-cap",     region: CN, category: equity_broad,   limit_group: cn_main,         expect_yield: 0.015}
+  - {code: "510500", name: "CSI 500 mid-cap",       region: CN, category: equity_mid,     limit_group: cn_main,         expect_yield: 0.004}
+  - {code: "159915", name: "ChiNext growth",        region: CN, category: equity_growth,  limit_group: cn_growth,       expect_yield: 0.000}
+  - {code: "588000", name: "STAR 50",               region: CN, category: equity_star,    limit_group: cn_growth,       expect_yield: 0.000}
+  - {code: "513100", name: "Nasdaq 100 (QDII)",     region: US, category: equity_intl,    limit_group: cn_cross_border, expect_yield: 0.000}
+  - {code: "513500", name: "S&P 500 (QDII)",        region: US, category: equity_intl,    limit_group: cn_cross_border, expect_yield: 0.000}
+  - {code: "159920", name: "Hang Seng (QDII)",      region: HK, category: equity_hk,      limit_group: cn_cross_border, expect_yield: 0.004}
+  - {code: "518880", name: "Gold",                  region: CN, category: commodity_gold, limit_group: cn_main,         expect_yield: 0.000}
+  - {code: "511010", name: "Treasury bonds",        region: CN, category: bond_treasury,  limit_group: cn_main,         expect_yield: 0.003}
+  - {code: "511260", name: "10Y government bonds",  region: CN, category: bond_long,      limit_group: cn_main,         expect_yield: 0.003}
+  - {code: "159985", name: "Soybean meal futures",  region: CN, category: commodity_agri, limit_group: cn_main,         expect_yield: 0.000}
+
+qc:
+  # Tighter than the US config because the expectations are mostly zero and a
+  # zero is a sharp target: there is no decade of varying payouts to absorb.
+  # First affected trading day of each published unit conversion, mirroring
+  # REDENOMINATIONS in data/fetch_cn_etfs.py. Undeclared steps large enough to
+  # be a conversion fail the run, so a fund that has one and is not listed here
+  # is caught rather than silently reported as a high-dividend payer.
+  redenominations:
+    "510500": ["2015-04-15", "2022-08-29"]
+    "513100": ["2022-01-14"]
+    "513500": ["2022-03-30"]
+  yield_tolerance: 0.010
+  negative_yield_floor: -0.002
+  plausible_cagr: [-0.10, 0.30]
+  max_missing_fraction: 0.02
+  min_observations: 250
+
+circuit_breaker:
+  enabled: false
+  soft_dd: 0.08
+  soft_scale: 0.50
+  hard_dd: 0.12
+  hard_cool: 10
+  daily_loss: 0.02
+  daily_loss_cool: 5
+  defensive_code: null
+
+tracking:
+  # On-exchange funds trade in lots of 100 units. At these prices one lot of
+  # the treasury sleeve is over 10,000 CNY, so the capital below buys a small
+  # number of lots and rounding is a real source of tracking error rather than
+  # a rounding detail — paper_trade.py reports the uninvested remainder.
+  lot_size: 100
+  capital: 100000
+  divergence_alert: 0.02
+  price_tolerance: 0.005

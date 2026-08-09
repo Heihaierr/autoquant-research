@@ -1,0 +1,20 @@
+{
+  "name": "autoquant-research",
+  "description": "Marketplace for the AutoQuant Research skills library",
+  "owner": {
+    "name": "bohao",
+    "email": "bhaoliu@163.com"
+  },
+  "plugins": [
+    {
+      "name": "autoquant-research",
+      "description": "A complete quantitative research methodology for coding agents, distilled from real walk-forward research: goal setting, data integrity, engine correctness, mechanism search, honest evaluation, and live tracking",
+      "version": "0.1.0",
+      "source": "./",
+      "author": {
+        "name": "bohao",
+        "email": "bhaoliu@163.com"
+      }
+    }
+  ]
+}

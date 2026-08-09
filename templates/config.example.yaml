@@ -1,0 +1,127 @@
+# Research configuration — copy to config.yaml and edit before use.
+#
+# Everything that is market-, vehicle- or account-specific lives here so that
+# nothing under framework/ has to be edited when you change markets. Fields
+# marked MARKET-SPECIFIC are the ones you must revisit.
+
+# ---------------------------------------------------------------------------
+# Research data hard cutoff.
+#
+# WHY THIS EXISTS: data after this date must never reach a backtest. Any period
+# you have already seen is not out-of-sample, no matter how the code is written.
+# data_loader enforces this with an assertion rather than trusting discipline.
+# Live signal generation is the only caller allowed to pass research=False.
+# ---------------------------------------------------------------------------
+research_end: "2024-12-31"
+
+data:
+  # Directory holding price files, relative to this config file.
+  cache_dir: "data/cache"
+  # Wide price table: index = date, one column per instrument, values =
+  # total-return adjusted prices (dividends reinvested). Parquet or CSV.
+  price_file: "prices.parquet"
+
+calendar:
+  # MARKET-SPECIFIC: trading days per year, used for annualization.
+  # US ~252, China A-share ~244, crypto 365.
+  trading_days_per_year: 252
+
+  # MARKET-SPECIFIC: annual risk-free rate used for excess Sharpe / Sortino.
+  # Use the yield you could actually earn on idle cash in this account.
+  risk_free_annual: 0.04
+
+cost:
+  # One-way cost as a fraction of traded notional: commission + half spread +
+  # any purchase/redemption fee. Charged on |Δweight| at each rebalance.
+  one_way: 0.0006
+  # Stress profile. Every result should be reported at both 1x and this
+  # multiple; a strategy that only survives at 1x is a cost-model artifact.
+  stress_multiplier: 2.0
+
+  # MARKET-SPECIFIC: penalty rate applied to sells that happen sooner than
+  # min_hold_days after entry (short-term redemption fees, wash-sale-like
+  # rules, maker/taker penalties...). Set min_hold_days: 0 to disable.
+  min_hold_days: 0
+  short_hold_penalty: 0.015
+
+rebalance:
+  # "monthly" = the (offset+1)-th trading day of each month.
+  # "weekly"  = last trading day of each week, plus every month's first
+  #             trading day so the weekly and monthly variants share dates.
+  freq: monthly
+  # Multi-offset (timing-luck) grid. A single offset embeds 1-2pp of luck in
+  # the annual return; always report the mean and the spread across offsets.
+  offsets: [0, 5, 10, 15]
+  # Number of holdings for ranking strategies that read this value.
+  top_n: 3
+  # Settlement delay in trading days between the rebalance decision and the
+  # new weights taking effect. 0 = same-day close. Raise it to model funds
+  # whose redemption proceeds are unavailable for a few days.
+  trade_lag: 0
+
+walk_forward:
+  first_test_year: 2015
+  last_test_year: 2024
+  # Years of history handed to the strategy before each test window starts.
+  # Must exceed the longest lookback any strategy uses.
+  lookback_years: 2
+
+benchmark:
+  # Single instrument used for excess return / information ratio / regimes.
+  primary: "ASSET_A"
+  # Passive comparison basket used by strategies/s0_passive.py. Weights are
+  # renormalized over whatever has data, so a late-listing asset is not a bug.
+  passive_blend:
+    - {code: "ASSET_A", weight: 0.25}
+    - {code: "ASSET_B", weight: 0.25}
+    - {code: "ASSET_C", weight: 0.25}
+    - {code: "ASSET_D", weight: 0.25}
+
+# ---------------------------------------------------------------------------
+# Instrument universe.
+#
+#   code         identifier, must match a column of the price table
+#   name         human-readable label, used only for reports
+#   holdable     false = data is loaded (usable as a signal) but the asset is
+#                never held. Useful for canary/indicator series.
+#   limit_group  key into PRICE_LIMIT_RULES in data/qc_price_limits.py.
+#                MARKET-SPECIFIC, see that file.
+# ---------------------------------------------------------------------------
+universe:
+  - {code: "ASSET_A", name: "Domestic broad equity", region: XX, category: broad,    limit_group: cn_main}
+  - {code: "ASSET_B", name: "Foreign broad equity",  region: US, category: broad,    limit_group: none}
+  - {code: "ASSET_C", name: "Gold",                  region: XX, category: commodity, limit_group: cn_main}
+  - {code: "ASSET_D", name: "Growth-board equity",   region: XX, category: growth,   limit_group: cn_growth}
+  - {code: "ASSET_E", name: "Government bonds",      region: XX, category: bond,     limit_group: cn_main, holdable: false}
+
+# ---------------------------------------------------------------------------
+# Optional circuit breaker (drawdown / daily-loss kill switch).
+#
+# Read references/failure-museum.md before enabling this. In our program every
+# variant of this idea cost more in whipsaw than it saved in drawdown. It is
+# here because you will want to test it, and testing it honestly requires it
+# to be off by default.
+# ---------------------------------------------------------------------------
+circuit_breaker:
+  enabled: false
+  soft_dd: 0.08          # drawdown at which target weights are scaled down
+  soft_scale: 0.50
+  hard_dd: 0.12          # drawdown at which everything is liquidated
+  hard_cool: 10          # trading days held flat after a hard breach
+  daily_loss: 0.02       # single-day loss that also triggers liquidation
+  daily_loss_cool: 5
+  defensive_code: null   # null = hold cash while cooling; or a ticker to hold
+
+tracking:
+  # MARKET-SPECIFIC: minimum tradable increment. Exchange-traded funds in
+  # China trade in lots of 100; US equities 1; crypto is effectively
+  # continuous (use a small value such as 0.00000001).
+  lot_size: 100
+  # Default capital for paper-trade snapshots, in account currency.
+  capital: 100000
+  # Alert threshold for strategy-layer divergence between the paper portfolio
+  # and the backtest-convention portfolio over one holding period.
+  divergence_alert: 0.02
+  # Tolerated relative difference between the price recorded in a snapshot and
+  # the price now in the database for that same date.
+  price_tolerance: 0.005
