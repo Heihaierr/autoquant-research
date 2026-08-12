@@ -124,10 +124,10 @@ the top.
 ## How this compares
 
 <p align="center">
-  <img src="../assets/comparison-quadrant.en.png" width="600" alt="Illustrative positioning: code-checking tools score low on methodology depth, trading agent products score low on flexibility, autoquant-research scores high on both">
+  <img src="../assets/tool-style-comparison.jpg" width="680" alt="Left: an AI coding tool with a magnifying glass, checking a scroll of code line by line for a checkmark or an X. Right: a locked box with a mechanical arm repeating the same motion on a fixed rail, feeding trade tickets out through a slot.">
 </p>
 
-**Against backtest-checking tools, the win is methodology.** They catch
+**Against AI coding tools, the win is methodology.** They catch
 look-ahead bugs and uncosted turnover, correctly — but those are code-level
 errors. A right number leading to a wrong conclusion is invisible to them.
 autoquant-research chains the standard validation techniques — walk-forward,

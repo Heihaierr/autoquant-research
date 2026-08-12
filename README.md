@@ -116,10 +116,10 @@ PYTHONPATH=. python framework/walk_forward.py --config config.us.yaml --strategy
 ## 和其他工具比
 
 <p align="center">
-  <img src="docs/assets/comparison-quadrant.zh.png" width="600" alt="示意图：编码检查类工具方法论较浅，自动交易 agent 产品灵活性较低，autoquant-research 在两个维度上都更强">
+  <img src="docs/assets/tool-style-comparison.jpg" width="680" alt="左：一个 AI coding 工具拿着放大镜逐行检查一份代码卷轴，只关心打勾还是打叉；右：一个上了锁的箱子，里面的机械臂在固定轨道上来回重复，交易单从底部的缝里递出来">
 </p>
 
-**跟回测代码检查工具比，赢在方法论。** 它们能抓未来函数、抓漏算成本，这些
+**跟 AI coding 工具比，赢在方法论。** 它们能抓未来函数、抓漏算成本，这些
 都对，但都是代码层面的错误——数字算对了、结论却推错了，它们看不出来。
 autoquant-research 把 walk-forward、多 offset 压力测试、双重成本档位这些
 标准验证方法按正确的顺序串起来，专门补这一块。

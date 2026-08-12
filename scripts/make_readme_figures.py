@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Generate the two illustrative figures used in the README.
+"""Generate the research-loop illustration used in the README.
 
-Both figures are conceptual, not measured. They exist to explain a claim
-in prose, not to report a result — every axis is unitless and every caption
-says so explicitly. This is the line that keeps them out of `social/`: a
-figure with no numbers on it cannot misrepresent a backtest, because it is
-not reporting one.
+The figure is conceptual, not measured. It exists to explain a claim in
+prose, not to report a result — every axis is unitless and the caption says
+so explicitly. This is the line that keeps it out of `social/`: a figure
+with no numbers on it cannot misrepresent a backtest, because it is not
+reporting one.
+
+The other README illustration (the AI-coding-tool vs. quant-agent
+comparison) is a hand-drawn image, generated once and committed directly
+to `docs/assets/tool-style-comparison.jpg` — there is nothing to regenerate.
 
 Run:
     python3 scripts/make_readme_figures.py
@@ -16,7 +20,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "assets"
@@ -40,71 +43,6 @@ def _style(lang: str) -> None:
     plt.rcParams["axes.labelcolor"] = INK
     plt.rcParams["xtick.color"] = INK
     plt.rcParams["ytick.color"] = INK
-
-
-def make_comparison_quadrant(lang: str) -> None:
-    _style(lang)
-    txt = {
-        "zh": dict(
-            xlabel="研究方法论的严谨程度  →",
-            ylabel="能否持续受益于更强的通用 agent  →",
-            p1="编码检查类工具\n(静态分析 / 未来函数扫描)",
-            p2="自动交易 agent 产品\n(封闭的交易机器人)",
-            p3="autoquant-research",
-            caption="示意图：三类工具在两个维度上的相对位置，不是精确测量。",
-        ),
-        "en": dict(
-            xlabel="Rigor of the research methodology  ->",
-            ylabel="Benefits from a stronger general agent  ->",
-            p1="Code-checking tools\n(static analysis, look-ahead scanners)",
-            p2="Trading agent products\n(closed automated bots)",
-            p3="autoquant-research",
-            caption="Illustrative positioning, not a precise measurement.",
-        ),
-    }[lang]
-
-    fig, ax = plt.subplots(figsize=(7.2, 5.4), dpi=200)
-    fig.subplots_adjust(left=0.09, right=0.97, top=0.93, bottom=0.16)
-
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    for side in ("top", "right"):
-        ax.spines[side].set_visible(False)
-    ax.spines["left"].set_position(("data", 0))
-    ax.spines["bottom"].set_position(("data", 0))
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-    ax.add_patch(
-        FancyArrowPatch((0, 0), (1.02, 0), arrowstyle="-|>", mutation_scale=14, color=INK, linewidth=1.1)
-    )
-    ax.add_patch(
-        FancyArrowPatch((0, 0), (0, 1.02), arrowstyle="-|>", mutation_scale=14, color=INK, linewidth=1.1)
-    )
-    ax.set_xlabel(txt["xlabel"], loc="left", fontsize=10.5)
-    ax.set_ylabel(txt["ylabel"], loc="bottom", fontsize=10.5)
-
-    ax.scatter([0.20], [0.14], s=90, color=GRAY, zorder=3)
-    ax.annotate(
-        txt["p1"], (0.20, 0.14), xytext=(0.23, 0.08), fontsize=9.6, color=INK, ha="left", va="top"
-    )
-
-    ax.scatter([0.32], [0.30], s=90, color=GRAY, zorder=3)
-    ax.annotate(
-        txt["p2"], (0.32, 0.30), xytext=(0.37, 0.37), fontsize=9.6, color=INK, ha="left", va="bottom"
-    )
-
-    ax.scatter([0.84], [0.82], s=140, color=NAVY, zorder=4, edgecolor="white", linewidth=1.2)
-    ax.annotate(
-        txt["p3"], (0.84, 0.82), xytext=(0.84, 0.90), fontsize=11, color=NAVY, ha="center", va="bottom", fontweight="bold"
-    )
-
-    ax.text(
-        0.5, -0.145, txt["caption"], transform=ax.transAxes, fontsize=9, color=GRAY, ha="center", va="top"
-    )
-
-    fig.savefig(OUT / f"comparison-quadrant.{lang}.png", facecolor="white")
-    plt.close(fig)
 
 
 def make_research_loop(lang: str) -> None:
@@ -210,7 +148,6 @@ def make_research_loop(lang: str) -> None:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for lang in ("zh", "en"):
-        make_comparison_quadrant(lang)
         make_research_loop(lang)
     print(f"wrote figures to {OUT}")
 
