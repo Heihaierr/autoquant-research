@@ -124,7 +124,7 @@ the top.
 ## How this compares
 
 <p align="center">
-  <img src="../assets/tool-style-comparison.jpg" width="680" alt="Left: an AI coding tool with a magnifying glass, checking a scroll of code line by line for a checkmark or an X. Right: a locked box with a mechanical arm repeating the same motion on a fixed rail, feeding trade tickets out through a slot.">
+  <img src="../assets/tool-style-comparison.en.jpg" width="680" alt="Left: an AI coding tool, checking code line by line for bugs and uncosted turnover, but blind to a right-numbers-wrong-conclusion error. Right: a quant trading agent, a closed automation pipeline that doesn't get smarter as the underlying agent does.">
 </p>
 
 **Against AI coding tools, the win is methodology.** They catch
@@ -141,36 +141,31 @@ inside a general-purpose AI agent (Claude Code, Cursor, Codex, …), so every
 improvement to the agent underneath it is an improvement to this, with
 nothing to upgrade on our end.
 
-## Using the templates
+## Reference implementation
 
-`templates/` is the **reference implementation of the spec**, not a library
-to depend on. It exists so the skills above are verifiable rather than
-aspirational: you can see exactly what a look-ahead guard looks like, which
-line asserts the research cutoff, and how three-layer reconciliation is
-actually computed.
-
-Two price tables ship with it — 11 US ETFs from 2006, 11 A-share ETFs from
-2011, both total-return adjusted and cross-checked against a second source —
-so this runs with no network access and no API key:
+`templates/` is not a library you `pip install` — it's the **reference
+implementation** of this methodology, so you can check the skills above
+against real code instead of taking them on faith: exactly what a
+look-ahead guard looks like, which line asserts the research cutoff, how
+three-layer reconciliation is actually computed. Quick start already ran
+the two price tables that ship with it; to see the data-quality check run
+on its own, add one line:
 
 ```bash
-cd templates && pip install -r requirements.txt
-
-pytest tests/ -q                                                     # engine + reconciliation assertions
 PYTHONPATH=. python data/qc_data_quality.py --config config.us.yaml   # is the data real?
-PYTHONPATH=. python framework/walk_forward.py --config config.us.yaml --strategy s0_passive
 ```
 
-Swap in `config.cn.yaml` for the A-share table. Full walkthrough, including
-what each script checks and why: [`templates/README.md`](../../templates/README.md).
-
-For your own market: copy the directory and replace the market-specific parts
-(instrument codes, price limits, cost model) with your own — or read it and
-implement the same guards in whatever stack you already have.
+To start your own research: copy the directory and replace the
+market-specific parts (instrument codes, price limits, cost model) with
+your own, keeping the framework, tests and guards as they are — or read it
+and implement the same guards in whatever stack you already have.
 
 ```bash
 cp -r templates/ my-research-project/
 ```
+
+Swap in `config.cn.yaml` for the A-share table. Full walkthrough, including
+what each script checks and why: [`templates/README.md`](../../templates/README.md).
 
 ## License
 

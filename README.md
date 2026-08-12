@@ -116,7 +116,7 @@ PYTHONPATH=. python framework/walk_forward.py --config config.us.yaml --strategy
 ## 和其他工具比
 
 <p align="center">
-  <img src="docs/assets/tool-style-comparison.jpg" width="680" alt="左：一个 AI coding 工具拿着放大镜逐行检查一份代码卷轴，只关心打勾还是打叉；右：一个上了锁的箱子，里面的机械臂在固定轨道上来回重复，交易单从底部的缝里递出来">
+  <img src="docs/assets/tool-style-comparison.zh.jpg" width="680" alt="左：AI coding 工具，逐行核对代码，抓未来函数和漏算成本，但数字算对了、结论对不对看不出来；右：quant agent 产品，一套封闭的自动化执行链，底层 agent 变强它也不会跟着变强">
 </p>
 
 **跟 AI coding 工具比，赢在方法论。** 它们能抓未来函数、抓漏算成本，这些
@@ -129,32 +129,28 @@ autoquant-research 把 walk-forward、多 offset 压力测试、双重成本档�
 装进通用 AI agent（Claude Code、Cursor、Codex……）里跑的一组 Agent Skills，
 底层 agent 每一次变强，它都直接受益，不用等产品方重新开发。
 
-## 用模板
+## 参考实现
 
-`templates/` 是这套方法的**参考实现**，不是一个要依赖的库。它让上面的 skill
-可核验而不是空谈——你能看到未来函数防护具体长什么样，研究截止日期是哪一行
-代码断言的，三层对账到底怎么算的。
-
-随包带了两张价格表——11 只美股 ETF（自 2006 年）、11 只 A 股 ETF（自 2011 年），
-均为总回报复权，且都用第二数据源交叉验证过——所以断网、不需要任何 API key 就能跑：
+`templates/` 不是一个要 `pip install` 进来的依赖库，是这套方法论的**参考
+实现**——上面每个 skill 说的护栏，这里都有对应的代码可以对照着看：未来函数
+防护具体怎么写的，研究截止日期是哪一行代码断言的，三层对账到底怎么算的。
+「快速开始」里跑的就是随包带的这两张价格表；想再看一眼数据质检怎么跑，多
+加一行：
 
 ```bash
-cd templates && pip install -r requirements.txt
-
-pytest tests/ -q                                                     # 引擎 + 对账逻辑的断言
 PYTHONPATH=. python data/qc_data_quality.py --config config.us.yaml   # 数据是真的吗？
-PYTHONPATH=. python framework/walk_forward.py --config config.us.yaml --strategy s0_passive
 ```
 
-换成 `config.cn.yaml` 就是 A 股那张表。完整说明见
-[`templates/README.md`](templates/README.md)。
-
-要接自己的市场：把整个目录复制一份，换掉市场相关的部分（标的代码、涨跌幅规则、
-成本模型）——或者直接读源码，把同样的防护搬进你已有的技术栈。
+要开始你自己的研究：把整个目录复制一份，换掉市场相关的部分（标的代码、
+涨跌幅规则、成本模型），框架、测试和护栏原样保留——或者直接读源码，把
+同样的防护搬进你已有的技术栈。
 
 ```bash
 cp -r templates/ my-research-project/
 ```
+
+换成 `config.cn.yaml` 就是 A 股那张表。完整说明见
+[`templates/README.md`](templates/README.md)。
 
 ## 免责声明
 
