@@ -24,6 +24,26 @@ end: set a target with you once, then fetch data, build and test an engine,
 search for a mechanism, evaluate it honestly, render a verdict, and track it
 live — without asking again unless it hits a real fork in the road.
 
+## Core features
+
+- **A more scientific way to experiment.** Not parameter guessing — a
+  disciplined process for finding what mechanism is actually driving a
+  result, then testing it properly. The goal is a strategy with a real
+  chance of working going forward, not a curve that only looks good in the
+  data you already have.
+- **Strict validation and data checks.** Every price series passes a
+  quality check before it reaches a backtest. Every strategy gets tested
+  across multiple time windows and cost assumptions, so the numbers behind
+  a "good result" actually hold up.
+- **A goal shaped to you, not a template.** It asks what drawdown you can
+  actually tolerate, how you trade, and what your account can buy, before
+  deciding what to test — so the target it works toward is yours, not a
+  generic default.
+- **Built from real research, not a reading list.** The common failure
+  modes are already written into the process, so the agent isn't
+  rediscovering them from scratch — fewer conversations, fewer tokens, to
+  reach a conclusion worth trusting.
+
 ## Quick start
 
 <details open>
