@@ -87,20 +87,6 @@ pytest tests/ -q
 PYTHONPATH=. python framework/walk_forward.py --config config.us.yaml --strategy s0_passive
 ```
 
-## Why this exists
-
-Tools that scan your backtest code for look-ahead bias and missing costs
-already exist, and they're useful — but **static analysis catches code
-errors. It cannot catch reasoning errors.** A conclusion like "the executable
-rule underperforms our benchmark, so that gap must be hindsight bias" can be
-built entirely out of correctly computed numbers and still be wrong, because
-attributing a measured gap to the right cause is a judgment call, not a
-statistic — and nothing about the arithmetic checks whether the judgment was
-sound. That's the narrower thing this closes the loop on: run the standard
-validation methods in the right order, and name the reasoning traps that show
-up *after* a check has correctly passed, before they turn into a shipped
-conclusion.
-
 ## The research loop
 
 `using-autoquant` is the entry point. It executes none of the stages below —
