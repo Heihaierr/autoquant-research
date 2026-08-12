@@ -132,23 +132,28 @@ today" goes to `shipping-and-tracking` — without walking the full loop from
 the top.
 
 <p align="center">
-  <img src="../assets/automation-chart.jpg" width="640" alt="Red: checked in the whole way, then breaks the moment the backtest ends. Blue: confirmed once at the start, gets there faster, and keeps climbing after the backtest ends.">
+  <img src="../assets/research-loop.en.png" width="680" alt="Illustrative: (a) without a methodology, research keeps interrupting you; autoquant-research only asks at the goal and at a real fork. (b) the ad-hoc curve weakens after going live; the autoquant-research curve keeps climbing.">
 </p>
 
 ## How this compares
 
-| | A generic coding agent | A backtesting library (backtrader, vectorbt, …) | A look-ahead / leakage linter | **autoquant-research** |
-|---|---|---|---|---|
-| What it is | A blank prompt | An engine you write strategies against | A static checker | A closed research loop, as Agent Skills |
-| Catches code errors (look-ahead bugs, leaked timestamps) | Only if you ask | No | Yes | Yes, via engine correctness tests |
-| Catches reasoning errors (right numbers, wrong conclusion) | No | No | No | Yes — this is the whole point |
-| Forces walk-forward + cost stress before a verdict | No | No | No | Yes |
-| Ships a runnable reference implementation | No | Yes, production-grade | No | Yes, teaching-grade — not for production |
-| Something to import or depend on | — | Yes | Sometimes | No — plain Markdown, no runtime |
+<p align="center">
+  <img src="../assets/comparison-quadrant.en.png" width="600" alt="Illustrative positioning: code-checking tools score low on methodology depth, trading agent products score low on flexibility, autoquant-research scores high on both">
+</p>
 
-It composes with the other three: run your engine on a backtesting library,
-run a linter over the code, and use this for the layer neither one covers —
-whether the conclusion you drew from a correct number is actually true.
+**Against backtest-checking tools, the win is methodology.** They catch
+look-ahead bugs and uncosted turnover, correctly — but those are code-level
+errors. A right number leading to a wrong conclusion is invisible to them.
+autoquant-research chains the standard validation techniques — walk-forward,
+multi-offset stress, both cost tiers — in the order that actually catches
+that gap.
+
+**Against trading agent products, the win is flexibility.** Those are
+usually closed automation pipelines that don't get smarter just because the
+underlying model does. autoquant-research is a set of Agent Skills that runs
+inside a general-purpose AI agent (Claude Code, Cursor, Codex, …), so every
+improvement to the agent underneath it is an improvement to this, with
+nothing to upgrade on our end.
 
 ## Using the templates
 
@@ -180,61 +185,6 @@ implement the same guards in whatever stack you already have.
 ```bash
 cp -r templates/ my-research-project/
 ```
-
-## Scope and honest limitations
-
-The methodology is vehicle-agnostic — `framing-the-goal` asks what your
-account can actually buy (ETFs, off-exchange funds, individual stocks) and
-the rest of the loop follows from that answer. The reference implementation
-that ships in `templates/` demonstrates it on global multi-asset ETF
-rotation — US and Chinese onshore/offshore vehicles, daily data, monthly
-rebalancing, long-only, no leverage — because that's the simplest complete
-example, not the ceiling on what the loop handles.
-
-Individual stocks add concerns an ETF basket doesn't have — single-name
-delisting and corporate actions, earnings-driven jumps, sector and factor
-crowding, thinner liquidity in the names you'd actually want to trade — and
-the reference implementation does not ship guards for any of them. If you're
-applying this to stocks, treat `building-the-foundation`'s data-quality tier
-as a floor to extend, not a ceiling already met.
-
-**What transfers:** the reasoning discipline. Attributing a gap to the right
-layer, distinguishing a plateau from a spike, telling date-luck apart from
-regime-luck, measuring what a validation actually leaves open. These are
-about how humans and agents fool themselves with backtests, and they're
-market-agnostic.
-
-**What doesn't automatically transfer:** specific thresholds calibrated to
-one market — a price-limit table, a cost model, an offset-dispersion
-rejection bar. Each skill says explicitly which of its numbers are
-illustrative defaults you should recalibrate and which are structural rules
-that hold regardless of market.
-
-**What this doesn't cover at all:** capacity and market impact at
-institutional size, classical survivorship bias in the delisted-instrument
-sense, formal multiple-testing corrections such as the deflated Sharpe ratio,
-currency exposure as its own risk factor, and anything intraday, leveraged,
-or derivative. If your program lives in one of those, treat this as a
-starting point, not a complete answer.
-
-## Philosophy
-
-- **The purpose of research is not to find a good backtest.** It's to find out
-  whether a good backtest means anything.
-- **Every validation answers a narrower question than the one you're asking.**
-  Write down what it leaves open.
-- **Reporting the boundary beats manufacturing the number.** The difference
-  between research and fabrication is whether you say "we looked and it isn't
-  there" or quietly relax the standard until the output looks good.
-- **A mechanism rules out a class. A number rules out one attempt.** File
-  every round either way.
-
-## Contributing
-
-See [`CONTRIBUTING.md`](../../CONTRIBUTING.md). The most useful contributions
-sharpen a skill's procedure, correct a threshold that's wrong outside the
-reference market, or close a gap in the loop — not strategy code or live
-parameters.
 
 ## License
 

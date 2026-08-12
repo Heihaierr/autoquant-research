@@ -494,6 +494,16 @@ plausible values of one parameter produce very different outcomes, the
 strategy depends on a quantity you do not know the true value of, and the
 best cell of the grid is the one with the most luck in it.
 
+### B7. Audit the report in a fresh subagent
+
+The agent that ran the round already believes it is finished — that is not a
+flaw, it is what "finished" feels like from the inside, and it is exactly why
+it is the wrong agent to grade the report against the checklist below.
+Dispatch a subagent with the report file and the checklist — not your
+summary of it — and have it name anything missing: an unreported convention,
+a missing offset σ, a caveat line that was skipped. Treat what it finds as
+blocking, the same as if you had found it yourself before writing the report.
+
 ## What a complete result looks like
 
 ```

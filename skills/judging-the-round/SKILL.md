@@ -199,6 +199,15 @@ Verify a direction is available before iterating into it. A constraint
 relaxation that looks attractive can turn out to be regulatorily impossible
 — minutes to check, weeks to iterate the wrong way.
 
+**Propose the next category in a fresh subagent.** The agent that just
+watched a hypothesis fail is invested in what to try next, and the easiest
+answer to reach for is the closest variant of the thing that just lost —
+which is the exact "iterating within the family that just failed" failure
+named above. Hand a subagent the mechanism map, the blacklist, and the
+constraint audit — not your own narrative about what almost worked — and
+have it name the untried category. Its answer is a candidate, not a verdict:
+check it against the map yourself before committing a round to it.
+
 ### Exit 3: STOP
 
 STOP means the target is not inside the achievable frontier and you are

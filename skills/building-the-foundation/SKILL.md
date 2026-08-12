@@ -323,6 +323,17 @@ cancels; a systematic bias in the flattering direction survives averaging and
 inflates every comparison equally. If all your errors ran one way, that is
 the finding, not the size.
 
+### B7. Adjudicate disputed points in a fresh subagent
+
+Whoever built the fetch integration and chose which chain to trust as the
+base already has a favorite going into B2's dispositions. Dispatch a
+subagent with only the raw caches from both chains and the list of disputed
+dates — not your working theory of which source is right — and have it
+produce the repair / exclude / flag call independently. Compare its calls
+against yours before writing the adjudication table; a disagreement means at
+least one of you was reading the evidence through a prior rather than on its
+own terms.
+
 ## Part C — the engine
 
 ### C1. Look-ahead protection: the spy strategy
@@ -507,6 +518,16 @@ Each line is one test, and each protects against a specific, real error mode.
 
 Rows 9 to 11 are easy to miss and are exactly what a multi-offset protocol
 silently depends on.
+
+### C10. Write the suite in a fresh subagent, before strategy code exists
+
+"I'll write the tests once the strategies work" (see Common rationalizations)
+is what happens by default when the same context builds the engine and later
+grades it — the tests end up matching whatever the engine already does,
+bug included. Dispatch a subagent to write and run the C9 suite against the
+engine alone, before any strategy file exists for it to have quietly been
+shaped around. The engine either passes a suite that was written blind to it,
+or it doesn't.
 
 ## Part D — the controls
 

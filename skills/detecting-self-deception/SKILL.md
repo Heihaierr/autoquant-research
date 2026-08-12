@@ -71,6 +71,23 @@ when you notice you *want* the result to be true, that is a signal to run
 this skill. It is listed last because it cannot be verified — by you or by
 anyone reading your work — and the table above can.
 
+## Answer these in a fresh subagent, not in yours
+
+The agent that produced the result is the worst-positioned agent to
+interrogate it — it has already seen the number, drafted the sentence, and
+formed an opinion about what the answer to each question should be. Whenever
+a trigger above fires, dispatch a fresh subagent to run the Five Questions
+instead of answering them in the current context.
+
+Give it only the artifacts a question needs — the report file, the
+pre-registration, the incumbent registry, the raw return series — never your
+own draft conclusion or the sentence you were about to write. An agent handed
+"here's my strategy, it looks great, can you double check" inherits the
+framing and mostly confirms it; an agent handed the report file and the five
+questions, with no narrative attached, does not. Take its answer over your
+own instinct when they disagree — that disagreement is precisely what this
+skill exists to surface.
+
 ## The Five Questions
 
 Run all five. They are ordered so the cheapest come first, but none is

@@ -101,6 +101,29 @@ loop that stops twenty times never finishes.
 Write every autonomous decision into the research log as you go. The log is
 what makes the run auditable, and it is the substitute for having asked.
 
+## Verification runs in a fresh subagent, not in yours
+
+An agent that runs on top of a general-purpose coding agent can do something
+a closed trading-bot product cannot: spin up a second, fully independent
+instance of itself to check its own work. Use that. Four checkpoints in this
+loop are specifically checks on the agent that just did the work, and each is
+weakest when run in the same context that produced the thing being checked —
+the agent already believes the data is clean, the engine is correct, or the
+result is good, because it just finished building it.
+
+| Checkpoint | Where | What the subagent gets |
+|---|---|---|
+| Data adjudication | `building-the-foundation`, B7 | Raw caches from both chains and the disputed dates — not your working theory of which source is right |
+| Engine correctness | `building-the-foundation`, C10 | The engine alone, before any strategy code exists |
+| Experiment audit | `running-experiments`, B7 | The report file and the checklist — not your summary of it |
+| Next mechanism | `judging-the-round`, ITERATE | The mechanism map and blacklist — not your narrative about what almost worked |
+| Self-deception check | `detecting-self-deception` | The report artifacts — never your draft conclusion |
+
+Each skill above states this explicitly at the point it applies; this table
+is the index. Treat a subagent's independent answer as evidence, not as a
+rubber stamp — when it disagrees with your own read, the disagreement is
+usually the finding.
+
 ## Entering in the middle
 
 Two stages are useful on their own and are written to be callable directly.
@@ -142,6 +165,10 @@ mode described in the skill that owns it.
     Minutes to check, weeks to research in the wrong direction.
 11. **Count mechanism categories, not experiments.** Ten parameter values are
     one experiment.
+12. **Data adjudication, engine tests, experiment audits, next-mechanism
+    proposals, and self-deception checks run in a fresh subagent** — never in
+    the context that built the pipeline, ran the experiment, or wants the
+    result to be true.
 
 ## Red flags
 
