@@ -13,36 +13,30 @@
   <a href="../../README.md">简体中文</a> | <b>English</b>
 </p>
 
-**An automated quant research methodology — rigorous enough to catch a fake edge, fast enough to ship the real one.**
+**The superpowers of quant strategy research — an automated research
+methodology that runs inside your AI agent, surfacing the strategies that
+actually hold up and screening out the ones that only look good.**
 
-A specification for systematic strategy research — ETFs, funds, and
-individual stocks, multi-asset allocation, walk-forward validation, honest
-performance attribution — built as portable Agent Skills, not a framework.
-There is nothing to import. Install it into Claude Code, Cursor, Codex, or
-any agent that reads Agent Skills, and it runs your research loop end to
-end: set a target with you once, then fetch data, build and test an engine,
-search for a mechanism, evaluate it honestly, render a verdict, and track it
-live — without asking again unless it hits a real fork in the road.
+A systematic trading research methodology for ETF rotation, stock
+picking, and multi-asset allocation: walk-forward backtesting, strict
+data quality checks, and honest performance attribution that separate
+strategies that look profitable from ones that actually are. Ships as a
+set of Agent Skills for Claude Code, Cursor, Codex, or any AI agent — not
+a framework to import, nothing to install.
 
 ## Core features
 
-- **A more scientific way to experiment.** Not parameter guessing — a
-  disciplined process for finding what mechanism is actually driving a
-  result, then testing it properly. The goal is a strategy with a real
-  chance of working going forward, not a curve that only looks good in the
-  data you already have.
-- **Strict validation and data checks.** Every price series passes a
-  quality check before it reaches a backtest. Every strategy gets tested
-  across multiple time windows and cost assumptions, so the numbers behind
-  a "good result" actually hold up.
-- **A goal shaped to you, not a template.** It asks what drawdown you can
-  actually tolerate, how you trade, and what your account can buy, before
-  deciding what to test — so the target it works toward is yours, not a
-  generic default.
-- **Built from real research, not a reading list.** The common failure
-  modes are already written into the process, so the agent isn't
-  rediscovering them from scratch — fewer conversations, fewer tokens, to
-  reach a conclusion worth trusting.
+- **Sharper experiments.** Finds the mechanism first, then validates it
+  step by step — aimed at a strategy with a real chance of working
+  forward, not a curve that only looks good in hindsight.
+- **Stricter validation.** Every price series passes a quality check, and
+  every strategy is tested across time windows and cost assumptions
+  before it's trusted.
+- **A goal that fits you.** Shaped by your risk tolerance, trading habits,
+  and what your account can actually buy — not a generic default.
+- **Fewer wasted steps.** Built from real research, so common failure
+  modes are already in the process — fewer conversations, fewer tokens,
+  to a conclusion worth trusting.
 
 ## Quick start
 
