@@ -47,6 +47,15 @@ a framework to import, nothing to install.
 /plugin marketplace add Heihaierr/autoquant-research
 /plugin install autoquant-research@autoquant-research
 ```
+
+Both steps are required: the first only registers the marketplace, the
+**second actually installs the skills**. After that, check Installed under
+`/plugin` for `autoquant-research`.
+
+Plugin skills **do not** show up in the built-in slash-command list next to
+`/usage`. Don't type `/using-autoquant` — just say a strategy idea in plain
+language, e.g. "help me research an ETF rotation strategy". The entry point
+is `using-autoquant`; the agent loads it itself.
 </details>
 
 <details>

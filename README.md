@@ -43,6 +43,13 @@ Codex 等任意 AI agent 就能直接用——不是要写代码调用的框架�
 /plugin marketplace add Heihaierr/autoquant-research
 /plugin install autoquant-research@autoquant-research
 ```
+
+两步都要跑：第一步只是把仓库登记进 marketplace，**第二步才真正装上
+skill**。装完后用 `/plugin` 看 Installed 里有没有 `autoquant-research`。
+
+插件 skill **不会**出现在 `/usage` 那种内置斜杠命令列表里。不要去敲
+`/using-autoquant`——直接用自然语言说一句策略想法就行，例如「帮我研究一个
+ETF 轮动策略」。入口是 `using-autoquant`，agent 会自己加载。
 </details>
 
 <details>
