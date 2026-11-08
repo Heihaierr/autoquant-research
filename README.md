@@ -47,9 +47,10 @@ Codex 等任意 AI agent 就能直接用——不是要写代码调用的框架�
 两步都要跑：第一步只是把仓库登记进 marketplace，**第二步才真正装上
 skill**。装完后用 `/plugin` 看 Installed 里有没有 `autoquant-research`。
 
-插件 skill **不会**出现在 `/usage` 那种内置斜杠命令列表里。不要去敲
-`/using-autoquant`——直接用自然语言说一句策略想法就行，例如「帮我研究一个
-ETF 轮动策略」。入口是 `using-autoquant`，agent 会自己加载。
+斜杠命令带插件前缀，和 superpowers 一样。入口是
+`/autoquant-research:using-autoquant`，不要敲 `/using-autoquant`——输入框里
+`/us` 会对上内置的 `/usage`。也可以不选命令，直接说「帮我研究一个 ETF
+轮动策略」，agent 会自己加载这个入口。
 </details>
 
 <details>

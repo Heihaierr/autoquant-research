@@ -52,10 +52,11 @@ Both steps are required: the first only registers the marketplace, the
 **second actually installs the skills**. After that, check Installed under
 `/plugin` for `autoquant-research`.
 
-Plugin skills **do not** show up in the built-in slash-command list next to
-`/usage`. Don't type `/using-autoquant` — just say a strategy idea in plain
-language, e.g. "help me research an ETF rotation strategy". The entry point
-is `using-autoquant`; the agent loads it itself.
+Slash commands are namespaced by the plugin, the same way superpowers is.
+The entry point is `/autoquant-research:using-autoquant`. Don't type
+`/using-autoquant` — `/us` matches the built-in `/usage`. Or skip the
+command and just say "help me research an ETF rotation strategy"; the agent
+loads that entry point itself.
 </details>
 
 <details>
